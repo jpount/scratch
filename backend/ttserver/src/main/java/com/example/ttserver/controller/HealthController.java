@@ -20,7 +20,7 @@ public class HealthController {
     @GetMapping("/health-message")
     @Operation(summary = "Health check message", description = "Simple health check message endpoint")
     public String health() {
-        return "OK - this is a health check message";
+        return "OK - this is another health check";
     }
 
     @GetMapping("/")
