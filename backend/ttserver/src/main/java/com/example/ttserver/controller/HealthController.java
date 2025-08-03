@@ -17,6 +17,12 @@ public class HealthController {
         return "OK";
     }
 
+    @GetMapping("/health-message")
+    @Operation(summary = "Health check message", description = "Simple health check message endpoint")
+    public String health() {
+        return "OK - this is a health check message";
+    }
+
     @GetMapping("/")
     @Operation(summary = "API Root", description = "Root endpoint for the API")
     public String root() {
