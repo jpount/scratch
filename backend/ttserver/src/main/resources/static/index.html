@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TomorrowTrader API - Home</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .link-card {
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+        .link-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+        }
+        .link-card a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .link-card a:hover {
+            color: #764ba2;
+        }
+        .link-card .description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background-color: #28a745;
+            color: white;
+            margin-top: 15px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 TomorrowTrader API</h1>
+        <p>Trading Application Backend Services</p>
+        <span class="status">🟢 Running</span>
+    </div>
+
+    <div class="section">
+        <h2>📋 API Documentation</h2>
+        <div class="links">
+            <div class="link-card">
+                <a href="/swagger-ui.html" target="_blank">Swagger UI</a>
+                <div class="description">Interactive API documentation with request/response examples and testing capabilities</div>
+            </div>
+            <div class="link-card">
+                <a href="/api-docs" target="_blank">OpenAPI Specification</a>
+                <div class="description">Raw OpenAPI JSON specification for programmatic access</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔧 Application Monitoring</h2>
+        <div class="links">
+            <div class="link-card">
+                <a href="/actuator/health" target="_blank">Health Check</a>
+                <div class="description">Application and dependencies health status</div>
+            </div>
+            <div class="link-card">
+                <a href="/actuator/info" target="_blank">Application Info</a>
+                <div class="description">Build information and application details</div>
+            </div>
+            <div class="link-card">
+                <a href="/actuator/metrics" target="_blank">Metrics</a>
+                <div class="description">Application performance metrics and statistics</div>
+            </div>
+            <div class="link-card">
+                <a href="/actuator/env" target="_blank">Environment</a>
+                <div class="description">Environment variables and configuration properties</div>
+            </div>
+            <div class="link-card">
+                <a href="/actuator/mappings" target="_blank">Request Mappings</a>
+                <div class="description">All available HTTP endpoints and their mappings</div>
+            </div>
+            <div class="link-card">
+                <a href="/actuator" target="_blank">All Actuator Endpoints</a>
+                <div class="description">Complete list of available actuator endpoints</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 API Endpoints</h2>
+        <div class="links">
+            <div class="link-card">
+                <a href="/api/" target="_blank">API Root</a>
+                <div class="description">Basic API welcome endpoint</div>
+            </div>
+            <div class="link-card">
+                <a href="/api/health" target="_blank">API Health</a>
+                <div class="description">Simple API health check endpoint</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🗄️ Database & Infrastructure</h2>
+        <div class="links">
+            <div class="link-card">
+                <a href="javascript:void(0)" onclick="alert('PostgreSQL: See docker-compose.yaml')">Database Info</a>
+                <div class="description">PostgreSQL database connection details</div>
+            </div>
+            <div class="link-card">
+                <a href="javascript:void(0)" onclick="alert('Artemis MQ: See docker-compose.yaml')">Message Broker</a>
+                <div class="description">Apache Artemis message queue information</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>TomorrowTrader Backend API v1.0.0 | Spring Boot 3.5.3 | Java 21</p>
+        <p>🔄 Auto-refreshing services via Docker Compose integration</p>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if endpoints are accessible
+            const healthCheck = async () => {
+                try {
+                    const response = await fetch('/actuator/health');
+                    if (response.ok) {
+                        console.log('✅ Health check passed');
+                    }
+                } catch (error) {
+                    console.log('❌ Health check failed:', error);
+                }
+            };
+            
+            healthCheck();
+            
+            // Update status every 30 seconds
+            setInterval(healthCheck, 30000);
+        });
+    </script>
+</body>
+</html>
