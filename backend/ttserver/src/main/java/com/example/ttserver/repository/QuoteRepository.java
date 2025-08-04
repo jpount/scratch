@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.util.List;
 
@@ -23,4 +25,8 @@ public interface QuoteRepository extends JpaRepository<Quote, Long> {
     
     @Query(value = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Quote findRandomQuote();
+    
+    // VULNERABILITY: SQL Injection - using string concatenation instead of parameterized queries
+    @Query(value = "SELECT * FROM quotes WHERE text LIKE '%" + ":searchTerm" + "%' OR author LIKE '%" + ":searchTerm" + "%'", nativeQuery = true)
+    List<Quote> unsafeSearch(@Param("searchTerm") String searchTerm);
 }

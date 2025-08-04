@@ -13,6 +13,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/quotes")
@@ -123,5 +133,98 @@ public class QuoteController {
     public ResponseEntity<Quote> getRandomQuote() {
         Quote quote = quoteService.getRandomQuote();
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
+    }
+    
+    // VULNERABILITY: Insecure Direct Object Reference - no authorization check
+    @GetMapping("/user/{userId}/quotes")
+    @Operation(summary = "Get user quotes", description = "Get all quotes for a specific user without authorization")
+    public ResponseEntity<List<Quote>> getUserQuotes(@PathVariable Long userId) {
+        // No authentication or authorization check - any user can access any other user's quotes
+        List<Quote> quotes = quoteService.getAllQuotes(); // Simulating user-specific quotes
+        return ResponseEntity.ok(quotes);
+    }
+    
+    // VULNERABILITY: Path Traversal - allows accessing files outside intended directory
+    @GetMapping("/export/{filename}")
+    @Operation(summary = "Export quotes", description = "Export quotes to file with path traversal vulnerability")
+    public ResponseEntity<Resource> exportQuotes(@PathVariable String filename) throws IOException {
+        // No validation of filename - allows path traversal attacks like "../../../etc/passwd"
+        Path filePath = Paths.get("/tmp/quotes/" + filename);
+        Resource resource = new UrlResource(filePath.toUri());
+        
+        if (resource.exists()) {
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .body(resource);
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
+    // VULNERABILITY: Unrestricted File Upload - no validation on file type or size
+    @PostMapping("/upload")
+    @Operation(summary = "Upload quote file", description = "Upload quotes from file with no restrictions")
+    public ResponseEntity<Map<String, String>> uploadQuoteFile(@RequestParam("file") MultipartFile file) throws IOException {
+        // No validation of file type, size, or content
+        String uploadDir = "/tmp/uploads/";
+        File uploadPath = new File(uploadDir);
+        if (!uploadPath.exists()) {
+            uploadPath.mkdirs();
+        }
+        
+        // VULNERABILITY: Using user input directly in file path
+        File dest = new File(uploadDir + file.getOriginalFilename());
+        file.transferTo(dest);
+        
+        // VULNERABILITY: Executing uploaded files
+        if (file.getOriginalFilename().endsWith(".sh")) {
+            Runtime.getRuntime().exec("sh " + dest.getAbsolutePath());
+        }
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "File uploaded successfully");
+        response.put("path", dest.getAbsolutePath());
+        return ResponseEntity.ok(response);
+    }
+    
+    // VULNERABILITY: Memory leak - creating large objects without cleanup
+    @GetMapping("/bulk-export")
+    @Operation(summary = "Bulk export", description = "Export all quotes with memory leak")
+    public ResponseEntity<String> bulkExport(HttpServletRequest request) throws IOException {
+        // Creating large StringBuilders that are never released
+        StringBuilder result = new StringBuilder();
+        List<StringBuilder> leakyList = new java.util.ArrayList<>();
+        
+        for (int i = 0; i < 10000; i++) {
+            StringBuilder sb = new StringBuilder(1000000); // 1MB each
+            sb.append("Quote data ").append(i).append("\n");
+            leakyList.add(sb); // Keeping reference, preventing garbage collection
+        }
+        
+        // VULNERABILITY: Not closing resources
+        FileWriter writer = new FileWriter("/tmp/quotes_export.txt");
+        writer.write(result.toString());
+        // writer.close() is missing - resource leak
+        
+        return ResponseEntity.ok("Export completed");
+    }
+    
+    // VULNERABILITY: Dangerous eval-like behavior
+    @PostMapping("/evaluate")
+    @Operation(summary = "Evaluate expression", description = "Dangerous endpoint that evaluates expressions")
+    public ResponseEntity<Object> evaluateExpression(@RequestBody Map<String, String> payload) {
+        String expression = payload.get("expression");
+        
+        // VULNERABILITY: Using reflection to execute arbitrary code
+        try {
+            if (expression.contains("Runtime.getRuntime")) {
+                // This could execute system commands
+                return ResponseEntity.ok("Expression evaluated");
+            }
+        } catch (Exception e) {
+            // VULNERABILITY: Exposing internal error details
+            return ResponseEntity.status(500).body(e.getMessage() + "\n" + e.getStackTrace());
+        }
+        
+        return ResponseEntity.ok("OK");
     }
 }
