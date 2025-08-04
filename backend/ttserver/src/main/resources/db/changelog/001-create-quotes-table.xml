@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="001-create-quotes-table" author="system">
+        <createTable tableName="quotes">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="category" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addUniqueConstraint tableName="quotes" columnNames="text,author" constraintName="uq_quote_text_author"/>
+        
+        <createIndex tableName="quotes" indexName="idx_quotes_category">
+            <column name="category"/>
+        </createIndex>
+        
+        <createIndex tableName="quotes" indexName="idx_quotes_author">
+            <column name="author"/>
+        </createIndex>
+    </changeSet>
+    
+    <changeSet id="002-insert-sample-quotes" author="system">
+        <insert tableName="quotes">
+            <column name="text" value="The only way to do great work is to love what you do."/>
+            <column name="author" value="Steve Jobs"/>
+            <column name="category" value="motivation"/>
+        </insert>
+        <insert tableName="quotes">
+            <column name="text" value="Innovation distinguishes between a leader and a follower."/>
+            <column name="author" value="Steve Jobs"/>
+            <column name="category" value="leadership"/>
+        </insert>
+        <insert tableName="quotes">
+            <column name="text" value="Life is what happens when you're busy making other plans."/>
+            <column name="author" value="John Lennon"/>
+            <column name="category" value="life"/>
+        </insert>
+        <insert tableName="quotes">
+            <column name="text" value="The future belongs to those who believe in the beauty of their dreams."/>
+            <column name="author" value="Eleanor Roosevelt"/>
+            <column name="category" value="inspiration"/>
+        </insert>
+        <insert tableName="quotes">
+            <column name="text" value="It is during our darkest moments that we must focus to see the light."/>
+            <column name="author" value="Aristotle"/>
+            <column name="category" value="wisdom"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
