@@ -23,4 +23,7 @@ public interface QuoteRepository extends JpaRepository<Quote, Long> {
     
     @Query(value = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Quote findRandomQuote();
+    
+    @Query(value = "SELECT * FROM quotes WHERE text LIKE '%" + "?1" + "%' OR author LIKE '%" + "?1" + "%'", nativeQuery = true)
+    List<Quote> searchQuotesUnsafe(String searchTerm);
 }

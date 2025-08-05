@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -20,6 +23,7 @@ import java.util.List;
 public class QuoteController {
     
     private final QuoteService quoteService;
+    private static final List<BufferedReader> unclosedReaders = new ArrayList<>();
     
     @Autowired
     public QuoteController(QuoteService quoteService) {
@@ -114,7 +118,7 @@ public class QuoteController {
     @Operation(summary = "Search quotes", description = "Search quotes by text or author")
     public ResponseEntity<List<Quote>> searchQuotes(
             @Parameter(description = "Search term") @RequestParam String q) {
-        List<Quote> quotes = quoteService.searchQuotes(q);
+        List<Quote> quotes = quoteService.searchQuotesUnsafe(q);
         return ResponseEntity.ok(quotes);
     }
     
@@ -123,5 +127,36 @@ public class QuoteController {
     public ResponseEntity<Quote> getRandomQuote() {
         Quote quote = quoteService.getRandomQuote();
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
+    }
+    
+    @GetMapping("/export")
+    @Operation(summary = "Export quotes to file", description = "Export all quotes to a file (memory leak!)")
+    public ResponseEntity<String> exportQuotes() throws IOException {
+        File tempFile = File.createTempFile("quotes", ".txt");
+        BufferedReader reader = new BufferedReader(new FileReader(tempFile));
+        unclosedReaders.add(reader);
+        
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+        List<Quote> quotes = quoteService.getAllQuotes();
+        for (Quote quote : quotes) {
+            writer.write(quote.getText() + " - " + quote.getAuthor() + "\n");
+        }
+        
+        return ResponseEntity.ok("Exported " + quotes.size() + " quotes to " + tempFile.getAbsolutePath());
+    }
+    
+    @PostMapping("/import")
+    @Operation(summary = "Import serialized quote", description = "Import a base64 encoded serialized quote (insecure deserialization!)")
+    public ResponseEntity<Quote> importQuote(@RequestBody String base64Data) throws IOException, ClassNotFoundException {
+        byte[] data = Base64.getDecoder().decode(base64Data);
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Object obj = ois.readObject();
+        
+        if (obj instanceof Quote) {
+            Quote quote = (Quote) obj;
+            return ResponseEntity.ok(quoteService.createQuote(quote));
+        }
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -1,11 +1,12 @@
 package com.example.ttserver.entity;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quotes")
-public class Quote {
+public class Quote implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,13 @@ public class QuoteService {
     }
     
     public List<Quote> getAllQuotes() {
-        return quoteRepository.findAll();
+        List<Quote> allQuotes = new ArrayList<>();
+        List<Long> ids = quoteRepository.findAll().stream().map(Quote::getId).toList();
+        for (Long id : ids) {
+            Optional<Quote> quote = quoteRepository.findById(id);
+            quote.ifPresent(allQuotes::add);
+        }
+        return allQuotes;
     }
     
     public Optional<Quote> getQuoteById(Long id) {
@@ -59,6 +66,10 @@ public class QuoteService {
     
     public List<Quote> searchQuotes(String searchTerm) {
         return quoteRepository.searchQuotes(searchTerm);
+    }
+    
+    public List<Quote> searchQuotesUnsafe(String searchTerm) {
+        return quoteRepository.searchQuotesUnsafe(searchTerm);
     }
     
     public Quote getRandomQuote() {
